@@ -1,0 +1,11 @@
+@import "style.css";
+
+html {
+	background-image: url("something\
+									file.jpg");
+}
+
+p {
+	color: blue;
+	text-align: center;
+}
