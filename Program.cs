@@ -15,7 +15,7 @@ namespace cssparser
 
             for (int i = 0; i < lines.Count; i++)
             {
-                var escaped = Escape(lines[i]);
+                /* var escaped = Escape(lines[i]);
 
                 var escapedArray = escaped.Split(';');
 
@@ -25,11 +25,11 @@ namespace cssparser
                 {
                     lines.Insert(i++, str);
                 }
-                
+                */
 
             }
 
-            Tokenize(lines);
+            Tokenize(lines.ToArray());
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#tokenizer-algorithms for reference
@@ -60,7 +60,7 @@ namespace cssparser
             var token = new StringToken("");
             int i = 0;
 
-            for (; i < line; i++)
+            for (; i < line.Length; i++)
             {
                 if (line[i] == '\n') {
                     token.token = Tokens.badStringToken;
@@ -80,7 +80,7 @@ namespace cssparser
             return (token, i);
         }
 
-        static (char codePoint, bool success) TokenizeEscape(string line) {
+        static (char codePoint, bool success) CheckEscape(string line) {
             if (line[0] != '\\')
             {
                 return (Char.MinValue, false);

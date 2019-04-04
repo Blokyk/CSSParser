@@ -9,3 +9,14 @@
 /home/blokyk/csharp/cssparser/obj/Debug/netcoreapp2.2/cssparser.AssemblyInfo.cs
 /home/blokyk/csharp/cssparser/obj/Debug/netcoreapp2.2/cssparser.dll
 /home/blokyk/csharp/cssparser/obj/Debug/netcoreapp2.2/cssparser.pdb
+/home/blokyk/Documents/CSharp/CSSSParser/obj/Debug/netcoreapp2.2/cssparser.csprojAssemblyReference.cache
+/home/blokyk/Documents/CSharp/CSSSParser/obj/Debug/netcoreapp2.2/cssparser.csproj.CoreCompileInputs.cache
+/home/blokyk/Documents/CSharp/CSSSParser/obj/Debug/netcoreapp2.2/cssparser.AssemblyInfoInputs.cache
+/home/blokyk/Documents/CSharp/CSSSParser/obj/Debug/netcoreapp2.2/cssparser.AssemblyInfo.cs
+/home/blokyk/Documents/CSharp/CSSSParser/obj/Debug/netcoreapp2.2/cssparser.dll
+/home/blokyk/Documents/CSharp/CSSSParser/obj/Debug/netcoreapp2.2/cssparser.pdb
+/home/blokyk/Documents/CSharp/CSSSParser/bin/Debug/netcoreapp2.2/cssparser.deps.json
+/home/blokyk/Documents/CSharp/CSSSParser/bin/Debug/netcoreapp2.2/cssparser.runtimeconfig.json
+/home/blokyk/Documents/CSharp/CSSSParser/bin/Debug/netcoreapp2.2/cssparser.runtimeconfig.dev.json
+/home/blokyk/Documents/CSharp/CSSSParser/bin/Debug/netcoreapp2.2/cssparser.dll
+/home/blokyk/Documents/CSharp/CSSSParser/bin/Debug/netcoreapp2.2/cssparser.pdb

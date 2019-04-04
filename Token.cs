@@ -9,20 +9,20 @@ public enum Tokens {
 }
 
 public class Token {
-    public char representation;
+    public string representation;
 
     public Tokens token;
 
-    public Token(char codePoint, Tokens token) {
+    public Token(string codePoints, Tokens token) {
         representation = codePoints;
         this.token = token;
     }
 }
 
 public class ComplexToken : Token {
-    public override string representation;
+    public new string representation;
 
-    public ComplexToken(string codePoints, Tokens token) {
+    public ComplexToken(string codePoints, Tokens token) : base(codePoints, token) {
         representation = codePoints;
         this.token = token;
     }
@@ -30,7 +30,7 @@ public class ComplexToken : Token {
 
 public class StringToken : ComplexToken {
 
-    public override Tokens token;
+    public new Tokens token;
     public StringToken(string codePoints) : base(codePoints, Tokens.stringToken) {}
 
     public void Add(char representationChar) {
@@ -40,7 +40,7 @@ public class StringToken : ComplexToken {
 
 public class UrlToken : ComplexToken {
 
-    public override Tokens token;
+    public new Tokens token;
     public StringToken url;
 
     public UrlToken(string codePoints, StringToken url) : base(codePoints, Tokens.urlToken) {
@@ -59,7 +59,7 @@ public class HashToken : ComplexToken {
 
 public class NumberToken : ComplexToken {
     public enum TypeFlag { Integrer, Number}
-    public TypeFlag type = Integrer;
+    public TypeFlag type = TypeFlag.Integrer;
     public float value;
 
     public NumberToken(string codePoints, float value, TypeFlag typeFlag) : base(codePoints, Tokens.numberToken) {
@@ -70,7 +70,7 @@ public class NumberToken : ComplexToken {
 
 public class DimensionToken : ComplexToken {
     public enum TypeFlag { Integrer, Number}
-    public TypeFlag type = Integrer;
+    public TypeFlag type = TypeFlag.Integrer;
     public float value;
     public string unit;
 
@@ -95,7 +95,7 @@ public class UnicodeRangeToken : Token {
     public int start;
     public int end;
     
-    public UnicodeRangeToken(char codePoint, int start, int end) : base(codePoint, Tokens.unicodeRangeToken) {
+    public UnicodeRangeToken(string codePoints, int start, int end) : base(codePoints, Tokens.unicodeRangeToken) {
         this.start = start;
         this.end = end;
     }
