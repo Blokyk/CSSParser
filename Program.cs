@@ -29,7 +29,27 @@ namespace cssparser
 
             }
 
+            lines = Preprocess(lines.ToArray()).ToList();
+
+            /* foreach (var line in lines) {
+                Console.WriteLine(line);
+            }*/
+
             Tokenize(lines.ToArray());
+        }
+
+        // See https://www.w3.org/TR/css-syntax-3/#input-preprocessing
+        static string[] Preprocess(string[] lines) {
+            for (int i = 0; i < lines.Length; i++)
+            {
+                lines[i] = lines[i].Replace("\u000D\u000D\u000A", "\u000A").
+                    Replace('\u000D', '\u000A').
+                    Replace('\u000C', '\u000A').
+                    Replace('\u0000', '\uFFFD');
+                //lines[i] = lines[i].Replace("\u000D\u000D\u000A",'\u000D', '\u000C', '\u000A');
+            }
+
+            return lines;
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#tokenizer-algorithms for reference
@@ -49,13 +69,14 @@ namespace cssparser
                         continue;
                     }
 
-                    if (currToken == '\u0022') {
+                    if (currToken == '\u0022') { // '\u0022' = '"'
                         
                     }
                 }
             }
         }
 
+        // See https://www.w3.org/TR/css-syntax-3/#consume-a-string-token
         static (StringToken token, int offset) TokenizeString(string line) {
             var token = new StringToken("");
             int i = 0;
@@ -80,17 +101,65 @@ namespace cssparser
             return (token, i);
         }
 
-        static (char codePoint, bool success) CheckEscape(string line) {
+        // See https://www.w3.org/TR/css-syntax-3/#consume-an-escaped-code-point
+        static char TokenizeEscape(string line) {
+
+            var hexDigits = 0;
+            var hexDigitsCount = 0;
+
+            char codePoint = '\u0000';
+            
+            for (int i = 0; i < line.Length; i++)
+            {
+                if (IshexDigit(line[i])) {
+                    hexDigits += (int)line[i];
+                    hexDigitsCount++;
+
+                    if (hexDigitsCount == 5)
+                    {
+                        codePoint = (char)hexDigits;
+
+                        if (hexDigits == 0)
+                        {
+                            
+                        }
+                    }
+                }
+            }
+
+            return '\uFFFD';
+        }
+
+        // See https://www.w3.org/TR/css-syntax-3/#starts-with-a-valid-escape
+        static bool CheckEscape(string line) {
             if (line[0] != '\\')
             {
-                return (Char.MinValue, false);
+                return false;
             }
 
             if (line[1] == '\n') {
-                return (Char.MinValue, false);
+                return false;
             }
 
-            return (line[1], true);
+            return true;
+        }
+
+        // See https://www.w3.org/TR/css-syntax-3/#hex-digit
+        static bool IsHexDigit(char codePoint) {
+
+            return codePoint.IsBetween(65, 70)  ||  // If it's between 'A' and 'F'
+                   codePoint.IsBetween(97, 102) ||  // Or if it's between 'a' and 'f'
+                   Char.IsDigit(codePoint);         // Or if it's a digit
+        }
+
+        static bool IsBetween(this char codePoint, int min, int max, bool inclusive=true) {
+            int cpInt = (int)codePoint;
+
+            if (inclusive) {
+                return (cpInt >= min && cpInt <= max) ? true : false;
+            } else {
+                return (cpInt > min && cpInt < max) ? true : false;
+            }
         }
     }
 }

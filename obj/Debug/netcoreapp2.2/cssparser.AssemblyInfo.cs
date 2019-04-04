@@ -7,10 +7,10 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("cssparser")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("Blok Inc")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
 [assembly: System.Reflection.AssemblyProductAttribute("cssparser")]
-[assembly: System.Reflection.AssemblyTitleAttribute("cssparser")]
+[assembly: System.Reflection.AssemblyTitleAttribute("CSS Parser")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

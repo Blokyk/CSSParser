@@ -4,3 +4,6 @@
 .git/
 
 bin/
+
+bin/Debug/netcoreapp2.2/cssparser.dll
+bin/Debug/netcoreapp2.2/cssparser.pdb
