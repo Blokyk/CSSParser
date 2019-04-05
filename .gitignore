@@ -5,5 +5,7 @@
 
 bin/
 
-bin/Debug/netcoreapp2.2/cssparser.dll
-bin/Debug/netcoreapp2.2/cssparser.pdb
+obj/Debug/netcoreapp2.2/cssparser.dll
+obj/Debug/netcoreapp2.2/cssparser.pdb
+
+#Tests.cs

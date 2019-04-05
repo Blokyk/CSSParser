@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/blokyk/Documents/CSharp/CSSSParser/cssparser.csproj": {}
+    "/home/blokyk/csharp/cssparser_straight/cssparser.csproj": {}
   },
   "projects": {
-    "/home/blokyk/Documents/CSharp/CSSSParser/cssparser.csproj": {
+    "/home/blokyk/csharp/cssparser_straight/cssparser.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/blokyk/Documents/CSharp/CSSSParser/cssparser.csproj",
+        "projectUniqueName": "/home/blokyk/csharp/cssparser_straight/cssparser.csproj",
         "projectName": "cssparser",
-        "projectPath": "/home/blokyk/Documents/CSharp/CSSSParser/cssparser.csproj",
+        "projectPath": "/home/blokyk/csharp/cssparser_straight/cssparser.csproj",
         "packagesPath": "/home/blokyk/.nuget/packages/",
-        "outputPath": "/home/blokyk/Documents/CSharp/CSSSParser/obj/",
+        "outputPath": "/home/blokyk/csharp/cssparser_straight/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/blokyk/.nuget/NuGet/NuGet.Config"
@@ -41,6 +41,18 @@
               "target": "Package",
               "version": "[2.2.0, )",
               "autoReferenced": true
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "(, )"
+            },
+            "System.Memory": {
+              "target": "Package",
+              "version": "(, )"
+            },
+            "System.Net.Http": {
+              "target": "Package",
+              "version": "(, )"
             }
           },
           "imports": [

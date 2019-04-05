@@ -1,8 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
-
+  <ItemGroup>
+    <PackageReference Include="System.Net.Http" Version="*"/>
+    <PackageReference Include="Newtonsoft.Json" Version="*"/>
+    <PackageReference Include="System.Memory" Version="*"/>
+  </ItemGroup>
 </Project>

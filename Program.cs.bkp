@@ -2,52 +2,76 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+
 using System.Linq;
-using System.Threading.Tasks;
-using System.Memory;
 
 namespace cssparser
 {
-    static class Program
+    class Program
     {
         static void Main(string[] args)
         {
-            var lines = File.ReadAllText(Directory.GetCurrentDirectory() + "/res/simple.css");
+            var lines = File.ReadAllLines(Directory.GetCurrentDirectory() + "/res/simple.css").ToList();
 
-            lines = Preprocess(lines);
+            for (int i = 0; i < lines.Count; i++)
+            {
+                /* var escaped = Escape(lines[i]);
+
+                var escapedArray = escaped.Split(';');
+
+                lines.RemoveAt(i);
+
+                foreach (var str in escapedArray)
+                {
+                    lines.Insert(i++, str);
+                }
+                */
+
+            }
+
+            lines = Preprocess(lines.ToArray()).ToList();
 
             /* foreach (var line in lines) {
                 Console.WriteLine(line);
             }*/
 
-            Tokenize(lines);
+            Tokenize(lines.ToArray());
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#input-preprocessing
-        static string Preprocess(string input) {
-            return input.Replace("\u000D\u000D\u000A", "\u000A").
+        static string[] Preprocess(string[] lines) {
+            for (int i = 0; i < lines.Length; i++)
+            {
+                lines[i] = lines[i].Replace("\u000D\u000D\u000A", "\u000A").
                     Replace('\u000D', '\u000A').
                     Replace('\u000C', '\u000A').
                     Replace('\u0000', '\uFFFD');
+                //lines[i] = lines[i].Replace("\u000D\u000D\u000A",'\u000D', '\u000C', '\u000A');
+            }
+
+            return lines;
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#tokenizer-algorithms for reference
-        static void Tokenize(string input) {
+        static void Tokenize(string[] lines) {
             var globalTokens = new List<Tokens[]>();
 
-            var inputTokens = new List<Tokens>();
-
-            for (int j = 0; j < input.Length; j++)
+            for (int i = 0; i < lines.Length; i++)
             {
-                var currToken = input[j];
+                var line = lines[i];
+                var lineTokens = new List<Tokens>();
+                for (int j = 0; j < line.Length; j++)
+                {
+                    var currToken = line[j];
 
-                if (Char.IsWhiteSpace(currToken)) {
-                    inputTokens.Add(Tokens.whitespaceToken);
-                    continue;
-                }
+                    if (Char.IsWhiteSpace(currToken)) {
+                        lineTokens.Add(Tokens.whitespaceToken);
+                        continue;
+                    }
 
-                if (currToken == '\u0022') { // '\u0022' = '"'
-                    
+                    if (currToken == '\u0022') { // '\u0022' = '"'
+                        
+                    }
                 }
             }
         }
@@ -71,15 +95,6 @@ namespace cssparser
                         i++;
                         continue;
                     }
-
-                    if (!CheckEscape(line.Substring(i)));
-
-                    char escapedCodePoint = TokenizeEscape(line.Substring(i));
-
-                    if (escaped)
-                    {
-                        
-                    }
                 }
             }
 
@@ -96,7 +111,7 @@ namespace cssparser
             
             for (int i = 0; i < line.Length; i++)
             {
-                if (IsHexDigit(line[i])) {
+                if (IshexDigit(line[i])) {
                     hexDigits += (int)line[i];
                     hexDigitsCount++;
 
