@@ -4,7 +4,6 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Memory;
 
 namespace cssparser
 {
@@ -32,14 +31,12 @@ namespace cssparser
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#tokenizer-algorithms for reference
-        static void Tokenize(string input) {
-            var globalTokens = new List<Tokens[]>();
-
+        static Token[] Tokenize(string input) {
             var inputTokens = new List<Tokens>();
 
-            for (int j = 0; j < input.Length; j++)
+            for (int i = 0; i < input.Length; i++)
             {
-                var currToken = input[j];
+                var currToken = input[i];
 
                 if (Char.IsWhiteSpace(currToken)) {
                     inputTokens.Add(Tokens.whitespaceToken);
@@ -47,84 +44,93 @@ namespace cssparser
                 }
 
                 if (currToken == '\u0022') { // '\u0022' = '"'
-                    
+                    TokenizeString(input.Substring(i + 1).ToCharArray());
                 }
             }
+
+            return null;
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#consume-a-string-token
-        static (StringToken token, int offset) TokenizeString(string line) {
+        static (StringToken token, int offset) TokenizeString(ReadOnlySpan<char> line) {
             var token = new StringToken("");
+            token.SetToken(Tokens.badStringToken);
+
             int i = 0;
 
             for (; i < line.Length; i++)
             {
                 if (line[i] == '\n') {
-                    token.token = Tokens.badStringToken;
                     break;
                 }
 
-                if (line[i] == '\\')
-                {
-                    if (line[i+1] == '\n')
-                    {
+                if (line[i] == '\\') {
+                    if (line[i+1] == '\n') {
                         i++;
                         continue;
                     }
 
-                    if (!CheckEscape(line.Substring(i)));
+                    if (!CheckEscape(line.Slice(i, i+1)));
 
-                    char escapedCodePoint = TokenizeEscape(line.Substring(i));
+                    var escaped = TokenizeEscape(line.Slice(i + 1));
 
-                    if (escaped)
-                    {
-                        
-                    }
+                    token.Add(escaped.codePoint);
+                    i += escaped.offset;
+                    continue;
                 }
+
+                if (line[i] == '\u0022') { // '\u0022' == '"'
+                    token.SetToken(Tokens.stringToken);
+                    Console.WriteLine("finished tokenizing string \"" + line.Slice(0, i).ToString() + "\"");
+                    break;
+                }
+
+                token.Add(line[i]);
             }
 
             return (token, i);
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#consume-an-escaped-code-point
-        static char TokenizeEscape(string line) {
+        static (char codePoint, int offset) TokenizeEscape(ReadOnlySpan<char> line) {
 
             var hexDigits = 0;
             var hexDigitsCount = 0;
 
-            char codePoint = '\uFFFD';
+            int i = 0;
+
+            char outputCodePoint = '\uFFFD';
             
-            for (int i = 0; i < line.Length; i++)
+            for (; i < line.Length; i++)
             {
                 if (IsHexDigit(line[i])) {
                     hexDigits += (int)line[i];
                     hexDigitsCount++;
 
                     if (hexDigitsCount == 5) {
-                        codePoint = (char)hexDigits;
+                        outputCodePoint = (char)hexDigits;
 
                         if (hexDigits == 0 ||                                    // If it's a null character escape
-                            codePoint.IsBetween((int)'\ud800', (int)'\udfff') || // Or if it's a surrogate code point
-                            codePoint.IsBetween(1114111, Char.MaxValue))         // Or if it's 
+                            outputCodePoint.IsBetween((int)'\ud800', (int)'\udfff') || // Or if it's a surrogate code point
+                            outputCodePoint.IsBetween(1114111, Char.MaxValue))         // Or if it's 
                         {
-                            return '\uFFFD';
+                            return ('\uFFFD', i);
                         }
 
-                        return codePoint;
+                        return (outputCodePoint, i);
                     }
                 } else {
                     Console.WriteLine("Escaped character \'" + line[i] + "\' because it isn't an hex digit");
-                    codePoint = line[i];
+                    outputCodePoint = line[i];
                 }
             }
 
-            return codePoint;
+            return (outputCodePoint, i);
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#starts-with-a-valid-escape
-        static bool CheckEscape(string line) {
-            if (line[0] != '\\')
-            {
+        static bool CheckEscape(ReadOnlySpan<char> line) {
+            if (line[0] != '\\') {
                 return false;
             }
 
