@@ -9,23 +9,26 @@ public enum Tokens {
 }
 
 public class Token {
-    public string representation;
+    public System.Text.StringBuilder representation;
 
     public Tokens token;
 
     public Token(string codePoints, Tokens token) {
-        representation = codePoints;
+        representation = new System.Text.StringBuilder(codePoints);
         this.token = token;
+    }
+    public string GetRepresentation() {
+        return representation.ToString();
+    }
+
+    public void SetToken(Tokens newToken) {
+        token = newToken;
     }
 }
 
 public class ComplexToken : Token {
-    public new string representation;
 
-    public ComplexToken(string codePoints, Tokens token) : base(codePoints, token) {
-        representation = codePoints;
-        this.token = token;
-    }
+    public ComplexToken(string codePoints, Tokens token) : base(codePoints, token) { }
 }
 
 public class StringToken : ComplexToken {
@@ -34,7 +37,11 @@ public class StringToken : ComplexToken {
     public StringToken(string codePoints) : base(codePoints, Tokens.stringToken) {}
 
     public void Add(char representationChar) {
-        representation += representationChar;
+        representation.Append(representationChar);
+    }
+
+    public void Add(string representationString) {
+        representation.Append(representationString);
     }
 }
 
