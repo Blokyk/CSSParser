@@ -1,8 +1,8 @@
 @import "style.css";
 
 html {
-	background-image: url("something\
-									file.jpg");
+	background-image: url('something "the rock" file.jpg');
+	size: 64;
 }
 
 p {
