@@ -101,5 +101,17 @@ namespace CSSParser.Helpers {
                     Replace('\u000C', '\u000A').
                     Replace('\u0000', '\uFFFD');
         }
+
+        public static TokenKind Mirror(this TokenKind token) {
+            if (token == TokenKind.closeCurlyToken) return TokenKind.openCurlyToken;
+            if (token == TokenKind.closeParenToken) return TokenKind.openParenToken;
+            if (token == TokenKind.closeSquareToken) return TokenKind.openSquareToken;
+
+            if (token == TokenKind.openCurlyToken) return TokenKind.closeCurlyToken;
+            if (token == TokenKind.openParenToken) return TokenKind.closeParenToken;
+            if (token == TokenKind.openSquareToken) return TokenKind.openSquareToken;
+
+            return token;
+        }
     }
 }

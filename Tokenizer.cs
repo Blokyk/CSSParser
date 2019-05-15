@@ -20,7 +20,7 @@ namespace CSSParser
                 var currToken = input[i];
 
                 while (Char.IsWhiteSpace(currToken)) {
-                    tokens.Add(Tokens.whitespaceToken);
+                    tokens.Add(TokenKind.whitespaceToken);
                     i++;
                     currToken = input[i];
                 }
@@ -54,7 +54,7 @@ namespace CSSParser
                 if (currToken == '$') {
                     if (input[i + 1] == '=') {
                         i++;
-                        tokens.Add(Tokens.suffixMatchToken);
+                        tokens.Add(TokenKind.suffixMatchToken);
                         continue;
                     }
                 }
@@ -62,7 +62,7 @@ namespace CSSParser
                 if (currToken == '*') {
                     if (input[i + 1] == '=') {
                         i++;
-                        tokens.Add(Tokens.substringMatchToken);
+                        tokens.Add(TokenKind.substringMatchToken);
                         continue;
                     }
                 }
@@ -77,15 +77,22 @@ namespace CSSParser
                 }
 
                 if (currToken == '-') {
-                    if (THelper.CheckNumber(input.Slice(i, 3))) {
-                        var number = TokenizeNumericToken(input.Slice(i));
+                    if (THelper.CheckNumber(input.Slice(i + 1, 3))) {
+                        var number = TokenizeNumericToken(input.Slice(i + 1));
                         tokens.Add(number.token);
-                        i += number.offset;
+                        i += number.offset + 1;
+                        continue;
+                    }
+
+                    if (THelper.CheckIndentifier(input.Slice(i + 1, 3))) {
+                        var identifier = TokenizeIdentLike(input.Slice(i + 1));
+                        tokens.Add(identifier.token);
+                        i += identifier.offset + 1;
                         continue;
                     }
 
                     if (input[i+1] == '-' && input[i+2] == '>') {
-                        tokens.Add(Tokens.CDCToken);
+                        tokens.Add(TokenKind.CDCToken);
                         continue;
                     }
                 }
@@ -109,12 +116,12 @@ namespace CSSParser
                 }
 
                 if (currToken == ':') {
-                    tokens.Add(Tokens.colonToken); // add <colon-token>
+                    tokens.Add(TokenKind.colonToken); // add <colon-token>
                     continue;
                 }
 
                 if (currToken == ';') {
-                    tokens.Add(Tokens.semicolonToken); // add <semicolon-token>
+                    tokens.Add(TokenKind.semicolonToken); // add <semicolon-token>
                     continue;
                 }
             
@@ -124,7 +131,7 @@ namespace CSSParser
                         input[i+3] == '-') 
                     {
                         i += 3;
-                        tokens.Add(Tokens.CDOToken);
+                        tokens.Add(TokenKind.CDOToken);
                         continue;
                     }
                 }
@@ -133,7 +140,7 @@ namespace CSSParser
                     if (THelper.CheckIndentifier(input.Slice(i+1, 3))) {
                         var name = TokenizeName(input.Slice(i));
                         i += name.offset;
-                        tokens.Add(new Token(name.result, Tokens.atToken));
+                        tokens.Add(new Token(name.result, TokenKind.atToken));
                         continue;
                     }
                 }
@@ -150,7 +157,7 @@ namespace CSSParser
                 if (currToken == '^') {
                     if (input[i+1] == '=') {
                         i++;
-                        tokens.Add(Tokens.prefixMatchToken);
+                        tokens.Add(TokenKind.prefixMatchToken);
                         continue;
                     }
                 }
@@ -172,13 +179,13 @@ namespace CSSParser
                 if (currToken == '\u007C') {
                     if (input[i+1] == '=') {
                         i++;
-                        tokens.Add(Tokens.dashMatchToken);
+                        tokens.Add(TokenKind.dashMatchToken);
                         continue;
                     }
 
                     if (input[i+1] == '\u007C') {
                         i++;
-                        tokens.Add(Tokens.columnToken);
+                        tokens.Add(TokenKind.columnToken);
                         continue;
                     }
                 }
@@ -186,7 +193,7 @@ namespace CSSParser
                 if (currToken == '~') {
                     if (input[i+1] == '=') {
                         i++;
-                        tokens.Add(Tokens.includeMatchToken);
+                        tokens.Add(TokenKind.includeMatchToken);
                         continue;
                     }
                 }
@@ -211,32 +218,32 @@ namespace CSSParser
                 }
 
                 if (currToken == '(') {
-                    tokens.Add(Tokens.openParenToken);
+                    tokens.Add(TokenKind.openParenToken);
                     continue;
                 }
 
                 if (currToken == ')') {
-                    tokens.Add(Tokens.closeParenToken);
+                    tokens.Add(TokenKind.closeParenToken);
                     continue;
                 }
             
                 if (currToken =='[') {
-                    tokens.Add(Tokens.openSquareToken);
+                    tokens.Add(TokenKind.openSquareToken);
                     continue;
                 }
 
                 if (currToken ==']') {
-                    tokens.Add(Tokens.closeSquareToken);
+                    tokens.Add(TokenKind.closeSquareToken);
                     continue;
                 }
 
                 if (currToken == '{') {
-                    tokens.Add(Tokens.openCurlyToken);
+                    tokens.Add(TokenKind.openCurlyToken);
                     continue;
                 }
 
                 if (currToken == '}') {
-                    tokens.Add(Tokens.closeCurlyToken);
+                    tokens.Add(TokenKind.closeCurlyToken);
                     continue;
                 }
             
@@ -310,10 +317,10 @@ namespace CSSParser
                     return (url.token, i);
                 }
 
-                return (new Token(name.result, Tokens.functionToken), name.offset);
+                return (new Token(name.result, TokenKind.functionToken), name.offset);
             }
 
-            return (new Token(name.result, Tokens.identToken), name.offset);
+            return (new Token(name.result, TokenKind.identToken), name.offset);
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#consume-a-url-token
@@ -328,11 +335,11 @@ namespace CSSParser
                 var str = TokenizeString(line.Slice(i+1), line[i]);
                 i += str.offset;
 
-                if (str.token.token == Tokens.badStringToken) {
+                if (str.token.token == TokenKind.badStringToken) {
 
                     THelper.ParseError(i, line);
 
-                    token.SetToken(Tokens.badUrlToken);
+                    token.SetToken(TokenKind.badUrlToken);
 
                     i += ConsumeBadUrl(line.Slice(i));
 
@@ -350,7 +357,7 @@ namespace CSSParser
 
                     THelper.ParseError(i, line);
 
-                    token.SetToken(Tokens.badUrlToken);
+                    token.SetToken(TokenKind.badUrlToken);
 
                     i += ConsumeBadUrl(line.Slice(i));
 
@@ -376,7 +383,7 @@ namespace CSSParser
 
                     THelper.ParseError(i, line);
 
-                    token.SetToken(Tokens.badUrlToken);
+                    token.SetToken(TokenKind.badUrlToken);
 
                     i += ConsumeBadUrl(line.Slice(i));
 
@@ -387,7 +394,7 @@ namespace CSSParser
 
                     THelper.ParseError(i, line);
 
-                    token.SetToken(Tokens.badUrlToken);
+                    token.SetToken(TokenKind.badUrlToken);
 
                     i += ConsumeBadUrl(line.Slice(i));
 
@@ -405,7 +412,7 @@ namespace CSSParser
 
                     THelper.ParseError(i, line);
 
-                    token.SetToken(Tokens.badUrlToken);
+                    token.SetToken(TokenKind.badUrlToken);
 
                     i += ConsumeBadUrl(line.Slice(i));
 
@@ -421,7 +428,7 @@ namespace CSSParser
         // See https://www.w3.org/TR/css-syntax-3/#consume-the-remnants-of-a-bad-url
         public static int ConsumeBadUrl(ReadOnlySpan<char> line) {
             var token = new UrlToken("", new StringToken(""));
-            token.SetToken(Tokens.badUrlToken);
+            token.SetToken(TokenKind.badUrlToken);
             int i = 0;
 
             for (; i < line.Length; i++) {
@@ -531,7 +538,7 @@ namespace CSSParser
         // See https://www.w3.org/TR/css-syntax-3/#consume-a-string-token
          public static (StringToken token, int offset) TokenizeString(ReadOnlySpan<char> line, char delimChar) {
             var token = new StringToken("");
-            token.SetToken(Tokens.badStringToken);
+            token.SetToken(TokenKind.badStringToken);
 
 
             int i = 0;
@@ -565,7 +572,7 @@ namespace CSSParser
                 }
 
                 if (line[i] == delimChar) { // '\u0022' == '"'
-                    token.SetToken(Tokens.stringToken);
+                    token.SetToken(TokenKind.stringToken);
                     break;
                 }
 

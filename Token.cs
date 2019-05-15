@@ -4,7 +4,7 @@ using System.Text;
 
 // See https://www.w3.org/TR/css-syntax-3/#tokenization for reference
 namespace CSSParser {
-    public enum Tokens
+    public enum TokenKind
     {
         identToken, functionToken, atToken, hashToken, stringToken, badStringToken,
         urlToken, badUrlToken, delimToken, numberToken, percentToken, dimensionToken,
@@ -24,26 +24,26 @@ namespace CSSParser {
     {
         public StringBuilder representation;
 
-        public Tokens token;
+        public TokenKind kind;
 
-        public Token(string codePoints, Tokens token)
+        public Token(string codePoints, TokenKind token)
         {
             representation = new StringBuilder(codePoints);
-            this.token = token;
+            this.kind = token;
         }
 
-        public Token(char codePoint, Tokens token) {
+        public Token(char codePoint, TokenKind token) {
             representation = new StringBuilder(codePoint.ToString());
-            this.token = token;
+            this.kind = token;
         }
         public string GetRepresentation()
         {
             return representation.ToString();
         }
 
-        public void SetToken(Tokens newToken)
+        public void SetToken(TokenKind newToken)
         {
-            token = newToken;
+            kind = newToken;
         }
 
         public override string ToString()
@@ -52,74 +52,74 @@ namespace CSSParser {
         }
 
         public static Token Default(char codePoint) {
-            return new Token(codePoint, Tokens.delimToken);
+            return new Token(codePoint, TokenKind.delimToken);
         }
 
-        public static implicit operator Token(Tokens token)
+        public static implicit operator Token(TokenKind token)
         {
             switch (token)
             {
-                case Tokens.CDCToken:
+                case TokenKind.CDCToken:
                     return new Token("<!--", token);
-                case Tokens.CDOToken:
+                case TokenKind.CDOToken:
                     return new Token("-->", token);
-                case Tokens.atToken:
+                case TokenKind.atToken:
                     return new ComplexToken("@", token);
-                case Tokens.badStringToken:
+                case TokenKind.badStringToken:
                     return new StringToken("");
-                case Tokens.badUrlToken:
+                case TokenKind.badUrlToken:
                     return new UrlToken("", new StringToken(""));
-                case Tokens.closeCurlyToken:
+                case TokenKind.closeCurlyToken:
                     return new Token("}", token);
-                case Tokens.closeParenToken:
+                case TokenKind.closeParenToken:
                     return new Token(")", token);
-                case Tokens.closeSquareToken:
+                case TokenKind.closeSquareToken:
                     return new Token("]", token);
-                case Tokens.colonToken:
+                case TokenKind.colonToken:
                     return new Token(";", token);
-                case Tokens.columnToken:
+                case TokenKind.columnToken:
                     return new Token("||", token);
-                case Tokens.commaToken:
+                case TokenKind.commaToken:
                     return new Token(",", token);
-                case Tokens.dashMatchToken:
+                case TokenKind.dashMatchToken:
                     return new Token("|=", token);
-                case Tokens.delimToken:
+                case TokenKind.delimToken:
                     return new Token("", token);
-                case Tokens.dimensionToken:
+                case TokenKind.dimensionToken:
                     return new DimensionToken("", 0, "");
-                case Tokens.functionToken:
+                case TokenKind.functionToken:
                     return new Token("_()", token);
-                case Tokens.hashToken:
+                case TokenKind.hashToken:
                     return new Token("#", token);
-                case Tokens.identToken:
+                case TokenKind.identToken:
                     return new Token("_", token);
-                case Tokens.includeMatchToken:
+                case TokenKind.includeMatchToken:
                     return new Token("~=", token);
-                case Tokens.numberToken:
+                case TokenKind.numberToken:
                     return new NumberToken("", 0);
-                case Tokens.openCurlyToken:
+                case TokenKind.openCurlyToken:
                     return new Token("{", token);
-                case Tokens.openParenToken:
+                case TokenKind.openParenToken:
                     return new Token("(", token);
-                case Tokens.openSquareToken:
+                case TokenKind.openSquareToken:
                     return new Token("[", token);
-                case Tokens.percentToken:
+                case TokenKind.percentToken:
                     return new PercentToken("%", 0);
-                case Tokens.prefixMatchToken:
+                case TokenKind.prefixMatchToken:
                     return new Token("^=", token);
-                case Tokens.semicolonToken:
+                case TokenKind.semicolonToken:
                     return new Token(";", token);
-                case Tokens.stringToken:
+                case TokenKind.stringToken:
                     return new StringToken("");
-                case Tokens.substringMatchToken:
+                case TokenKind.substringMatchToken:
                     return new Token("*=", token);
-                case Tokens.suffixMatchToken:
+                case TokenKind.suffixMatchToken:
                     return new Token("$=", token);
-                case Tokens.unicodeRangeToken:
+                case TokenKind.unicodeRangeToken:
                     return new UnicodeRangeToken("", -1, -1);
-                case Tokens.urlToken:
+                case TokenKind.urlToken:
                     return new UrlToken("", new StringToken(""));
-                case Tokens.whitespaceToken:
+                case TokenKind.whitespaceToken:
                     return new Token(" ", token);
                 default:
                     throw new System.NotImplementedException("This token is not implemented yet : " + token.ToString());
@@ -130,14 +130,14 @@ namespace CSSParser {
     public class ComplexToken : Token
     { // ident ; function ; at ; hash ; string ; url ; 
 
-        public ComplexToken(string codePoints, Tokens token) : base(codePoints, token) { }
+        public ComplexToken(string codePoints, TokenKind token) : base(codePoints, token) { }
     }
 
     public class StringToken : ComplexToken
     {
 
-        public new Tokens token;
-        public StringToken(string codePoints) : base(codePoints, Tokens.stringToken) { }
+        public new TokenKind token;
+        public StringToken(string codePoints) : base(codePoints, TokenKind.stringToken) { }
 
         public void Add(char representationChar)
         {
@@ -153,10 +153,10 @@ namespace CSSParser {
     public class UrlToken : ComplexToken
     {
 
-        public new Tokens token;
+        public new TokenKind token;
         public StringToken url;
 
-        public UrlToken(string codePoints, StringToken url) : base(codePoints, Tokens.urlToken)
+        public UrlToken(string codePoints, StringToken url) : base(codePoints, TokenKind.urlToken)
         {
             this.url = url;
         }
@@ -187,7 +187,7 @@ namespace CSSParser {
 
         public TypeFlag type = TypeFlag.Unrestricted;
 
-        public HashToken(string codePoints) : base(codePoints, Tokens.hashToken) { }
+        public HashToken(string codePoints) : base(codePoints, TokenKind.hashToken) { }
 
         public void SetTypeflag(TypeFlag flag)
         {
@@ -200,12 +200,12 @@ namespace CSSParser {
         public TypeFlag type = TypeFlag.Integrer;
         public float value;
 
-        public NumberToken(string codePoints, float value) : base(codePoints, Tokens.numberToken)
+        public NumberToken(string codePoints, float value) : base(codePoints, TokenKind.numberToken)
         {
             this.value = value;
         }
 
-        public NumberToken(string codePoints, float value, TypeFlag flag) : base(codePoints, Tokens.numberToken)
+        public NumberToken(string codePoints, float value, TypeFlag flag) : base(codePoints, TokenKind.numberToken)
         {
             this.value = value;
             type = flag;
@@ -224,14 +224,14 @@ namespace CSSParser {
         public string unit;
 
         public DimensionToken(string codePoints, float value, string unit)
-            : base(codePoints, Tokens.dimensionToken)
+            : base(codePoints, TokenKind.dimensionToken)
         {
             this.value = value;
             this.unit = unit;
         }
 
         public DimensionToken(string codePoints, float value, string unit, TypeFlag flag)
-            : base(codePoints, Tokens.dimensionToken)
+            : base(codePoints, TokenKind.dimensionToken)
         {
             this.value = value;
             this.unit = unit;
@@ -252,7 +252,7 @@ namespace CSSParser {
     {
         public float value;
 
-        public PercentToken(string codePoints, float value) : base(codePoints, Tokens.percentToken)
+        public PercentToken(string codePoints, float value) : base(codePoints, TokenKind.percentToken)
         {
             this.value = value;
         }
@@ -263,7 +263,7 @@ namespace CSSParser {
         public int start;
         public int end;
 
-        public UnicodeRangeToken(string codePoints, int start, int end) : base(codePoints, Tokens.unicodeRangeToken)
+        public UnicodeRangeToken(string codePoints, int start, int end) : base(codePoints, TokenKind.unicodeRangeToken)
         {
             this.start = start;
             this.end = end;

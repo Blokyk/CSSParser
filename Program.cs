@@ -26,10 +26,10 @@ namespace CSSParser
 
             foreach (var token in tokens)
             {
-                Console.WriteLine(token.token + " : " + token);
+                Console.WriteLine(token.kind + " : " + token);
             }
 
-            Console.WriteLine(new SimpleBlockNode() {token = new Token(" ", Tokens.whitespaceToken)}.token);
+            Console.WriteLine(new SimpleBlockNode(new Token(" ", TokenKind.whitespaceToken)).token);
         }
     }
 }
