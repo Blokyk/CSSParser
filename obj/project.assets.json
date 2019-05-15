@@ -3534,7 +3534,8 @@
     ]
   },
   "packageFolders": {
-    "/home/blokyk/.nuget/packages/": {}
+    "/home/blokyk/.nuget/packages/": {},
+    "/usr/share/dotnet/sdk/NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
@@ -3545,6 +3546,9 @@
       "packagesPath": "/home/blokyk/.nuget/packages/",
       "outputPath": "/home/blokyk/csharp/cssparser_straight/obj/",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "/usr/share/dotnet/sdk/NuGetFallbackFolder"
+      ],
       "configFilePaths": [
         "/home/blokyk/.nuget/NuGet/NuGet.Config"
       ],

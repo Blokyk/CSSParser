@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-namespace TreeLib
+namespace CSSParser.Tree
 {
     public class Node<T> : INode<T>
     {

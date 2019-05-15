@@ -13,6 +13,9 @@
         "packagesPath": "/home/blokyk/.nuget/packages/",
         "outputPath": "/home/blokyk/csharp/cssparser_straight/obj/",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
         "configFilePaths": [
           "/home/blokyk/.nuget/NuGet/NuGet.Config"
         ],

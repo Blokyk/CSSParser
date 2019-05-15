@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using CSSParser;
 using CSSParser.Helpers;
 
-namespace cssparser
+namespace CSSParser
 {
     static class Program
     {
@@ -28,6 +28,8 @@ namespace cssparser
             {
                 Console.WriteLine(token.token + " : " + token);
             }
+
+            Console.WriteLine(new SimpleBlockNode() {token = new Token(" ", Tokens.whitespaceToken)}.token);
         }
     }
 }

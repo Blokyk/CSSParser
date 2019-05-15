@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-namespace TreeLib 
+namespace CSSParser.Tree 
 {
     public interface INode<T> : IEquatable<T>, IEquatable<Node<T>>
     {        

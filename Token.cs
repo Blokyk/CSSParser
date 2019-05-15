@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 using System.Text;
 
-
 // See https://www.w3.org/TR/css-syntax-3/#tokenization for reference
 namespace CSSParser {
     public enum Tokens

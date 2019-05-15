@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Linq;
 
-namespace TreeLib
+namespace CSSParser.Tree
 {
     public class Tree<T>: ITree<T>
     {
