@@ -24,12 +24,22 @@ namespace CSSParser
 
             var tokens = Tokenizer.Tokenize(lines);
 
-            foreach (var token in tokens)
+            /*foreach (var token in tokens)
             {
                 Console.WriteLine(token.kind + " : " + token);
+            }*/
+
+            var rules = ParseStylesheet(tokens).cssRules;
+
+            foreach (RuleNode rule in rules)
+            {
+                foreach (var prelude in rule.prelude)
+                {
+                    // TODO: finish the ToString() functions in the different RuleNode classes
+                }
             }
 
-            Console.WriteLine(new SimpleBlockNode(new Token(" ", TokenKind.whitespaceToken)).token);
+            //Console.WriteLine(new SimpleBlockNode(new Token(" ", TokenKind.whitespaceToken)).token);
         }
     }
 }

@@ -13,10 +13,14 @@ namespace CSSParser
     {
 
         // See https://www.w3.org/TR/css-syntax-3/#parse-a-stylesheet
-        public static SyntaxNode ParseStylesheet(ReadOnlySpan<Token> input) {
-            var root = new SyntaxNode();
+        public static CSSStyleSheet ParseStylesheet(ReadOnlySpan<Token> input) {
+            var output = new CSSStyleSheet();
 
-            return root;
+            var rules = ParseListOfRules(input, true);
+            
+            output.cssRules = rules;
+
+            return output;
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#consume-a-list-of-rules
@@ -28,12 +32,34 @@ namespace CSSParser
             for (; i < input.Length; i++) {
                 currToken = input[i];
 
-                if (currToken.kind == TokenKind.whitespaceToken) {
+                if (currToken == TokenKind.whitespaceToken) {
                     continue;
                 }
 
-                if (currToken.kind == TokenKind.atToken) {
+                if (currToken == TokenKind.atToken) {
+                    var atRule = ParseAtRule(input.Slice(i + 1));
 
+                    output.Add(atRule.node);
+                    i += atRule.offset;
+                    continue;
+                }
+
+                if (currToken == TokenKind.CDOToken
+                    || currToken == TokenKind.CDCToken) 
+                {
+                    if (topLevel) {
+                        continue;
+                    }
+
+                    var qualifiedRule = ParseQualifiedRule(input.Slice(i));
+
+                    if (qualifiedRule == null) {
+                        continue;
+                    }
+
+                    output.Add(qualifiedRule.node);
+                    i += qualifiedRule.offset;
+                    continue;
                 }
             }
 
@@ -46,8 +72,26 @@ namespace CSSParser
             Token currToken;
 
             int i = 0;
+
             for (; i < input.Length; i++) {
                 currToken = input[i];
+
+                if (currToken == TokenKind.openCurlyToken) {
+                    var simpleBlock = ParseSimpleBlock(input.Slice(i));
+
+                    output.block = simpleBlock.node;
+                    i += simpleBlock.offset;
+                    break;
+                }
+
+                if (currToken == TokenKind.semicolonToken) {
+                    break;
+                }
+
+                var compo = ParseCompoValue(input.Slice(i));
+
+                output.prelude.Add(compo.node);
+                i += compo.offset;
             }
 
             return (output, i);
@@ -60,7 +104,7 @@ namespace CSSParser
                 return (new SimpleBlockNode(TokenKind.delimToken), 0);
             }
 
-            TokenKind endingTokenKind = input[0].kind.Mirror();
+            TokenKind endingToken = input[0].kind.Mirror();
             var output = new SimpleBlockNode(input[0]);
             Token currToken;
 
@@ -68,11 +112,14 @@ namespace CSSParser
             for (; i < input.Length; i++) {
                 currToken = input[i];
 
-                if (currToken.kind == endingTokenKind) {
+                if (currToken == endingToken) {
                     break;
                 }
 
+                var compo = ParseCompoValue(input.Slice(i));
 
+                output.value.Add(compo.node);
+                i += compo.offset;
             }
 
             return (output, i);
@@ -82,16 +129,16 @@ namespace CSSParser
         public static (ComponentValueNode node, int offset) ParseCompoValue(ReadOnlySpan<Token> input) {
             var currToken = input[1];
                 
-                if (currToken.kind == TokenKind.openCurlyToken
-                    || currToken.kind == TokenKind.openParenToken
-                    || currToken.kind == TokenKind.openSquareToken)
+                if (currToken == TokenKind.openCurlyToken
+                    || currToken == TokenKind.openParenToken
+                    || currToken == TokenKind.openSquareToken)
                 {
                     var block = ParseSimpleBlock(input.Slice(1));
 
                     return (block.node, block.offset);
                 }
 
-                if (currToken.kind == TokenKind.functionToken) {
+                if (currToken == TokenKind.functionToken) {
                     var function = ParseFunction(input.Slice(2)); /* 2 => 1 (i) + 1 (index increment) */
 
                     return (function.node, function.offset);
@@ -114,17 +161,43 @@ namespace CSSParser
             for (; i < input.Length; i++) {
                 currToken = input[i];                
 
-                if (currToken.kind == TokenKind.closeParenToken) {
+                if (currToken == TokenKind.closeParenToken) {
                     break;
                 }
 
-                var compoValue = ParseCompoValue(input.Slice(i));
+                var compo = ParseCompoValue(input.Slice(i));
 
-                output.value.Add(compoValue.node);
-                i += compoValue.offset;
+                output.value.Add(compo.node);
+                i += compo.offset;
             }
 
             return (output, i);
+        }
+
+        // See https://www.w3.org/TR/css-syntax-3/#consume-a-qualified-rule
+        public static (QualifiedRuleNode node, int offset) ParseQualifiedRule(ReadOnlySpan<Token> input) {
+            var output = new QualifiedRuleNode();
+            Token currToken;
+
+            int i = 0;
+            for (; i < input.Length; i++) {
+                currToken = input[i];
+
+                if (currToken == TokenKind.openCurlyToken) {
+                    var simpleBlock = ParseSimpleBlock(input.Slice(i));
+
+                    output.value = simpleBlock.node;
+                    i += simpleBlock.offset;
+                    return (output, i);
+                }
+
+                var compo = ParseCompoValue(input.Slice(i));
+
+                output.prelude.Add(compo.node);
+                i += compo.offset;
+            }
+
+            Console.WriteLine("Parse error : EOF in qualified rule");
         }
     }
 }

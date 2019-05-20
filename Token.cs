@@ -125,6 +125,10 @@ namespace CSSParser {
                     throw new System.NotImplementedException("This token is not implemented yet : " + token.ToString());
             }
         }
+
+        public static implicit operator TokenKind(Token token) {
+            return token.kind;
+        }
     }
 
     public class ComplexToken : Token

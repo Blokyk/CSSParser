@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Collections.Generic;
 
 using CSSParser;
@@ -9,12 +10,7 @@ using CSSParser.Tree;
 
 namespace CSSParser 
 {
-    public class SyntaxNode 
-    {
-        
-    }
-
-    public class RuleNode : SyntaxNode 
+    public class RuleNode 
     {
         public List<ComponentValueNode> prelude;
         public SimpleBlockNode block;
@@ -30,16 +26,25 @@ namespace CSSParser
 
     }
 
-    public class DeclarationNode : SyntaxNode
+    public class DeclarationNode : RuleNode
     {
         public string name;
-        public List<ComponentValueNode> value;
         public bool important; 
     }
 
-    public class ComponentValueNode : SyntaxNode
+    public class ComponentValueNode : RuleNode
     {
-        
+        public override string ToString() {
+            var strBuilder = new StringBuilder();
+
+            foreach (var prelude in this.prelude) {
+                strBuilder.AppendLine(prelude.ToString());
+            }
+
+            strBuilder.AppendLine(this.block.ToString());
+
+            return strBuilder.ToString();
+        }
     }
 
     public class PreservedTokensNode : ComponentValueNode
@@ -48,6 +53,10 @@ namespace CSSParser
 
         public PreservedTokensNode(Token token) {
             this.token = token;
+        }
+
+        public override string ToString() {
+            return base.ToString()
         }
     }
 
@@ -81,5 +90,10 @@ namespace CSSParser
             this.token = token;
             this.value = new List<ComponentValueNode>(value);
         }
+    }
+
+    public class CSSStyleSheet
+    {
+        public List<RuleNode> cssRules;
     }
 }
