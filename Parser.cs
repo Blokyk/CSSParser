@@ -18,7 +18,7 @@ namespace CSSParser
 
             var rules = ParseListOfRules(input, true);
             
-            output.cssRules = rules;
+            output.cssRules = rules.ruleList;
 
             return output;
         }
@@ -53,7 +53,7 @@ namespace CSSParser
 
                     var qualifiedRule = ParseQualifiedRule(input.Slice(i));
 
-                    if (qualifiedRule == null) {
+                    if (qualifiedRule.node == null) {
                         continue;
                     }
 
@@ -186,7 +186,7 @@ namespace CSSParser
                 if (currToken == TokenKind.openCurlyToken) {
                     var simpleBlock = ParseSimpleBlock(input.Slice(i));
 
-                    output.value = simpleBlock.node;
+                    output.block = simpleBlock.node;
                     i += simpleBlock.offset;
                     return (output, i);
                 }
@@ -198,6 +198,7 @@ namespace CSSParser
             }
 
             Console.WriteLine("Parse error : EOF in qualified rule");
+            return (null, 0);
         }
     }
 }

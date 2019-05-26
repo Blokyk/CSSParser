@@ -19,7 +19,7 @@ namespace CSSParser {
         Integrer, Number, Unrestricted, Id
     }
 
-    [System.Diagnostics.DebuggerDisplay("{token} : {representation.ToString()}")]
+    [System.Diagnostics.DebuggerDisplay("{kind} : {representation.ToString()}")]
     public class Token
     {
         public StringBuilder representation;

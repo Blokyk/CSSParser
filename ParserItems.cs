@@ -14,6 +14,10 @@ namespace CSSParser
     {
         public List<ComponentValueNode> prelude;
         public SimpleBlockNode block;
+
+        public RuleNode() {
+            prelude = new List<ComponentValueNode>();
+        }
     }
 
     public class AtRuleNode : RuleNode
@@ -56,7 +60,7 @@ namespace CSSParser
         }
 
         public override string ToString() {
-            return base.ToString()
+            return base.ToString();
         }
     }
 
@@ -95,5 +99,9 @@ namespace CSSParser
     public class CSSStyleSheet
     {
         public List<RuleNode> cssRules;
+
+        public CSSStyleSheet() {
+            cssRules = new List<RuleNode>();
+        }
     }
 }
