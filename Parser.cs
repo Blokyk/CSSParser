@@ -68,7 +68,7 @@ namespace CSSParser
 
         // See https://www.w3.org/TR/css-syntax-3/#consume-an-at-rule0
         public static (AtRuleNode node, int offset) ParseAtRule(ReadOnlySpan<Token> input) {
-            var output = new AtRuleNode();
+            var output = new AtRuleNode(input[0].GetRepresentation());
             Token currToken;
 
             int i = 0;

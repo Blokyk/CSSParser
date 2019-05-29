@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using CSSParser;
 using CSSParser.Helpers;
 
+using DotGenerator;
+
 namespace CSSParser
 {
     static class Program
@@ -24,22 +26,45 @@ namespace CSSParser
 
             var tokens = Tokenizer.Tokenize(lines);
 
-            /*foreach (var token in tokens)
+            foreach (var token in tokens)
             {
                 Console.WriteLine(token.kind + " : " + token);
-            }*/
-
-            var rules = ParseStylesheet(tokens).cssRules;
-
-            foreach (RuleNode rule in rules)
-            {
-                foreach (var prelude in rule.prelude)
-                {
-                    // TODO: finish the ToString() functions in the different RuleNode classes
-                }
             }
 
+            var rules = Parser.ParseStylesheet(tokens).cssRules;
+
+            var graph = new Graph("Stylesheet");
+
+            for (int i = 0; i < rules.Count; i++)
+            {
+                var rootNode = new GraphNode(rules[i].GetHashCode().ToString(), "root");
+
+                rootNode.AddNode(ToGraphNode(rules[i]));
+            }
+
+            Console.WriteLine(graph.ToText());
+
             //Console.WriteLine(new SimpleBlockNode(new Token(" ", TokenKind.whitespaceToken)).token);
+        }
+
+        static GraphNode ToGraphNode(RuleNode node)
+        {
+            var root = new GraphNode(node.GetHashCode().ToString());
+
+            var tempCompoNode = new GraphNode((node.GetHashCode() + "compo").GetHashCode().ToString(), "compo");
+
+            foreach (var compoValue in ((RuleNode)node).prelude)
+            {
+                tempCompoNode.AddNode(ToGraphNode(compoValue));
+            }
+
+            var tempBlockNode = new GraphNode((node.GetHashCode() + "block").GetHashCode().ToString(), "block");
+            tempBlockNode.AddNode(ToGraphNode(((RuleNode)node).block));
+
+            root.AddNode(tempCompoNode);
+            root.AddNode(tempBlockNode);
+
+            return root;
         }
     }
 }

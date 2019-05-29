@@ -140,7 +140,7 @@ namespace CSSParser {
     public class StringToken : ComplexToken
     {
 
-        public new TokenKind token;
+        public TokenKind token;
         public StringToken(string codePoints) : base(codePoints, TokenKind.stringToken) { }
 
         public void Add(char representationChar)
@@ -157,7 +157,7 @@ namespace CSSParser {
     public class UrlToken : ComplexToken
     {
 
-        public new TokenKind token;
+        public TokenKind token;
         public StringToken url;
 
         public UrlToken(string codePoints, StringToken url) : base(codePoints, TokenKind.urlToken)

@@ -1,5 +1,5 @@
 using System;
-//using 
+using System.Collections.Generic;
 
 namespace CSSParser.Helpers {
     public static class THelper {
@@ -112,6 +112,28 @@ namespace CSSParser.Helpers {
             if (token == TokenKind.openSquareToken) return TokenKind.openSquareToken;
 
             return token;
+        }
+    }
+}
+
+namespace System.Linq
+{
+    public static class EnumHelper
+    {
+        public static IEnumerable<TResult> Apply<T, TResult>(this IEnumerable<T> source, Func<T, TResult> transformFunction) {
+            var output = new TResult[source.Count()];
+
+            int i = 0;
+
+            foreach (var item in source) {
+                if (!(i < source.Count()))
+                    break;
+
+                output[i] = transformFunction(item);
+                i++;
+            }
+
+            return (IEnumerable<TResult>)output;
         }
     }
 }
