@@ -29,7 +29,7 @@ namespace CSSParser
                     var output = TokenizeString(input.Slice(i + 1), currToken);
                     tokens.Add(output.token);
                     i += output.offset;
-                    Console.WriteLine("Tokenized string : " + output.token);
+                    //Console.WriteLine("Tokenized string : " + output.token);
                     continue;
                 }
 
@@ -46,7 +46,7 @@ namespace CSSParser
                         hashToken.representation = new StringBuilder(name.result);
                         i += name.offset;
                         tokens.Add(hashToken); // and return it 
-                        Console.WriteLine("Tokenized name : " + name.result);
+                        //Console.WriteLine("Tokenized name : " + name.result);
                         continue;
                     }
                 }

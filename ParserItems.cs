@@ -55,7 +55,7 @@ namespace CSSParser
                 strBuilder.AppendLine(prelude.ToString());
             }
 
-            strBuilder.AppendLine(this.block.ToString());
+            if (this.block != null) { strBuilder.AppendLine(this.block.ToString()); }
 
             return strBuilder.ToString();
         }

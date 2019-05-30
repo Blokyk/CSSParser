@@ -22,8 +22,8 @@ namespace DotGenerator
         {
             var strBuilder = new StringBuilder();
 
-            strBuilder.AppendLine("digraph " + name);
-            strBuilder.AppendLine("{");
+            strBuilder.AppendLine("digraph " + name + " {");
+            strBuilder.AppendLine();
 
             var registry = new List<GraphNode>();
 
@@ -39,29 +39,37 @@ namespace DotGenerator
         }
     }
 
-    [System.Diagnostics.DebuggerDisplay("{name}:{label}")]
+    [System.Diagnostics.DebuggerDisplay("{id}:{label}")]
     public class GraphNode
     {
-        public string name;
+        public string id;
         public string label;
 
         public List<GraphNode> childrens;
 
-        public GraphNode(string name)
+        public GraphNode(string id)
         {
-            this.name = name;
-            label = name;
+            this.id = id;
+            label = id;
             childrens = new List<GraphNode>();
         }
 
-        public GraphNode(string name, string label)
+        public GraphNode(string id, string label)
         {
-            this.name = name;
+            this.id = id;
             this.label = label;
             childrens = new List<GraphNode>();
         }
 
-        public void AddNode(GraphNode node) => childrens.Add(node);
+        public GraphNode(int id, string label) : this(id.ToString(), label) {}
+
+        public void AddNode(GraphNode node) {
+            if (node != null) {
+                childrens.Add(node);
+            } else {
+                //Console.WriteLine("Node was null");
+            }
+        }
 
         public string ToText(List<GraphNode> registry)
         {
@@ -69,8 +77,8 @@ namespace DotGenerator
 
             foreach (var child in childrens)
             {
-                strBuilder.AppendLine($"{name} [label={label}]");
-                strBuilder.AppendLine("\t" + name + " -> " + child.name);
+                strBuilder.AppendLine($"{id} [label=\"{label}\"]");
+                strBuilder.AppendLine("\t" + id + " -> " + child.id);
 
                 if (!registry.Contains(child))
                 {
@@ -81,7 +89,7 @@ namespace DotGenerator
 
             if (childrens.Count == 0)
             {
-                strBuilder.Append($"{name} [label={label}]\n\t");
+                strBuilder.Append($"{id} [label=\"{label}\"]\n\t");
             }
 
             return strBuilder.ToString();
