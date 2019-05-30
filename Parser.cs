@@ -39,6 +39,11 @@ namespace CSSParser
                 if (currToken == TokenKind.atToken) {
                     var atRule = ParseAtRule(input.Slice(i + 1));
 
+                    if (atRule.node == null) {
+                        i += atRule.offset;
+                        continue;
+                    }
+
                     output.Add(atRule.node);
                     i += atRule.offset;
                     continue;
@@ -54,6 +59,7 @@ namespace CSSParser
                     var qualifiedRule = ParseQualifiedRule(input.Slice(i));
 
                     if (qualifiedRule.node == null) {
+                        i += qualifiedRule.offset;
                         continue;
                     }
 
@@ -61,6 +67,15 @@ namespace CSSParser
                     i += qualifiedRule.offset;
                     continue;
                 }
+
+                var qualifiedrule = ParseQualifiedRule(input.Slice(i));
+
+                if (qualifiedrule.node == null) {
+                    continue;
+                }
+                
+                output.Add(qualifiedrule.node);
+                i += qualifiedrule.offset;
             }
 
             return (output, i);
@@ -85,10 +100,17 @@ namespace CSSParser
                 }
 
                 if (currToken == TokenKind.semicolonToken) {
+                    i++;
                     break;
                 }
 
-                var compo = ParseCompoValue(input.Slice(i));
+                
+
+                var compo = ParseCompoValue(input.Slice(i != 0 ? --i : i));
+
+                if (compo.node == null) {
+                    continue; 
+                }
 
                 output.prelude.Add(compo.node);
                 i += compo.offset;
@@ -116,7 +138,12 @@ namespace CSSParser
                     break;
                 }
 
-                var compo = ParseCompoValue(input.Slice(i));
+                var compo = ParseCompoValue(input.Slice(i != 0 ? --i : i));
+
+                if (compo.node == null) {
+                    i += compo.offset;
+                    continue;
+                }
 
                 output.value.Add(compo.node);
                 i += compo.offset;
@@ -127,24 +154,24 @@ namespace CSSParser
 
         // See https://www.w3.org/TR/css-syntax-3/#consume-a-component-value
         public static (ComponentValueNode node, int offset) ParseCompoValue(ReadOnlySpan<Token> input) {
-            var currToken = input[1];
+            var currToken = input[0];
                 
-                if (currToken == TokenKind.openCurlyToken
-                    || currToken == TokenKind.openParenToken
-                    || currToken == TokenKind.openSquareToken)
-                {
-                    var block = ParseSimpleBlock(input.Slice(1));
+            if (currToken == TokenKind.openCurlyToken
+                || currToken == TokenKind.openSquareToken
+                || currToken == TokenKind.openParenToken)
+            {
+                var block = ParseSimpleBlock(input.Slice(0));
+                return (block.node, block.offset);
+            }
 
-                    return (block.node, block.offset);
-                }
+            if (currToken == TokenKind.functionToken) {
+                var function = ParseFunction(input.Slice(1)); /* 2 => 1 (i) + 1 (index increment) */
+                return (function.node, function.offset);
+            }
 
-                if (currToken == TokenKind.functionToken) {
-                    var function = ParseFunction(input.Slice(2)); /* 2 => 1 (i) + 1 (index increment) */
+            //if (currToken == TokenKind.whitespaceToken) return (null, 1);
 
-                    return (function.node, function.offset);
-                }
-
-            return (new PreservedTokensNode(input[1]), 1);
+            return (new PreservedTokensNode(currToken), 0);
         }
 
         // See https://www.w3.org/TR/css-syntax-3/#consume-a-function
@@ -165,7 +192,7 @@ namespace CSSParser
                     break;
                 }
 
-                var compo = ParseCompoValue(input.Slice(i));
+                var compo = ParseCompoValue(input.Slice(i != 0 ? --i : i));
 
                 output.value.Add(compo.node);
                 i += compo.offset;
@@ -191,14 +218,20 @@ namespace CSSParser
                     return (output, i);
                 }
 
-                var compo = ParseCompoValue(input.Slice(i));
+                var compo = ParseCompoValue(input.Slice(i != 0 ? --i : i));
+
+                if (compo.node == null) {
+                    i += compo.offset;
+                    continue;
+                }
 
                 output.prelude.Add(compo.node);
                 i += compo.offset;
             }
 
-            Console.WriteLine("Parse error : EOF in qualified rule");
-            return (null, 0);
+            //Console.WriteLine("Parse error : EOF in qualified rule");
+            throw new Exception("Parse error : EOF in qualified rule");
+            //return (null, 0);
         }
     }
 }

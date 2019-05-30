@@ -57,7 +57,7 @@ namespace CSSParser
         {
             if (node == null) return null;
 
-            var root = new GraphNode(random.Next(), "Rule");
+            var root = new GraphNode(random.Next(), node.GetType().Name);
 
             /* var nodeFields = node.GetType().GetFields();
 
@@ -115,7 +115,7 @@ namespace CSSParser
         {
             if (node == null) return null;
 
-            Console.WriteLine("At");
+            //Console.WriteLine("At");
 
             var root = ToGraphNode((RuleNode)node);
 
@@ -135,7 +135,7 @@ namespace CSSParser
                 root.AddNode(ToGraphNode((dynamic)value));
             }
 
-            Console.WriteLine("Simple");
+            //Console.WriteLine("Simple");
 
             return root;
         }
@@ -144,9 +144,9 @@ namespace CSSParser
         {
             if (node == null) return null;
 
-            Console.WriteLine("Compo");
+            /* Console.WriteLine("Compo");
             Console.WriteLine(node.ToString());
-            Console.WriteLine();
+            Console.WriteLine();*/
 
             var root = new GraphNode(random.Next(), "Component Value");
 
@@ -160,9 +160,9 @@ namespace CSSParser
             root.AddNode(preludeNode);
 
             if (node.block != null) {
-                var tempBlock = new GraphNode(random.Next(), "block");
-                tempBlock.AddNode(ToGraphNode((dynamic)node.block));
-                root.AddNode(tempBlock);
+                var blockNode = new GraphNode(random.Next(), "block");
+                blockNode.AddNode(ToGraphNode((dynamic)node.block));
+                root.AddNode(blockNode);
             }
 
             return root;
@@ -172,11 +172,37 @@ namespace CSSParser
         {
             if (node == null) return null;
 
-            Console.WriteLine("Preserved");
+            if (node.token == TokenKind.whitespaceToken || node.token == TokenKind.semicolonToken) return null;
+
+            /* Console.WriteLine("Preserved");
             Console.WriteLine(node.token.GetRepresentation());
-            Console.WriteLine();
+            Console.WriteLine();*/
 
             return new GraphNode(random.Next(), node.token.GetRepresentation());
+        }
+
+        static GraphNode ToGraphNode(QualifiedRuleNode node) 
+        {
+            if (node == null) return null;
+
+            var root = new GraphNode(random.Next(), "Qualified Rule");
+
+            var preludeNode = new GraphNode(random.Next(), "prelude");
+
+            foreach (var prelude in node.prelude)
+            {
+                preludeNode.AddNode(ToGraphNode((dynamic)prelude));
+            }
+
+            root.AddNode(preludeNode);
+
+            if (node.block != null) {
+                var blockNode = new GraphNode(random.Next(), "block");
+                blockNode.AddNode(ToGraphNode((dynamic)node.block));
+                root.AddNode(blockNode);
+            }
+
+            return root;
         }
 
         /*static GraphNode ToGraphNode(RuleNode node)

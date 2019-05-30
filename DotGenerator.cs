@@ -57,7 +57,7 @@ namespace DotGenerator
         public GraphNode(string id, string label)
         {
             this.id = id;
-            this.label = label;
+            this.label = label.Replace('"', '\'');
             childrens = new List<GraphNode>();
         }
 

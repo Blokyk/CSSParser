@@ -327,67 +327,52 @@ namespace CSSParser
         public static (UrlToken token, int offset) TokenizeUrl(ReadOnlySpan<char> line) {
             var token = new UrlToken("", new StringToken(""));
 
-            int i = 0;
-
-            while (Char.IsWhiteSpace(line[i])) i++;
-
-            if (line[i] == '"' || line[i] == '\'') {
-                var str = TokenizeString(line.Slice(i+1), line[i]);
-                i += str.offset;
-
-                if (str.token.token == TokenKind.badStringToken) {
-
-                    THelper.ParseError(i, line);
-
-                    token.SetToken(TokenKind.badUrlToken);
-
-                    i += ConsumeBadUrl(line.Slice(i));
-
-                    return (token, i);
-                }
-
-                token.SetUrl(str.token.representation.ToString());
-
-                while (Char.IsWhiteSpace(line[i])) i++;
-
-                if (line[i+1] == ')') {
-                    i++;
-                    return (token, i);
-                } else {
-
-                    THelper.ParseError(i, line);
-
-                    token.SetToken(TokenKind.badUrlToken);
-
-                    i += ConsumeBadUrl(line.Slice(i));
-
-                    return (token, i);
-                }
-            }
-
-            i++;
+            int i = 0;            
 
             for (; i < line.Length; i++)
             {
                 while (Char.IsWhiteSpace(line[i])) i++;
 
-                if (line[i+1] == ')') {
-                    i++;
-                    return (token, i);
-                }
+                if (line[i] == ')') {
+                    return (token, i + 1);
+                }             
 
                 if (line[i] == '"' ||
                     line[i] == '\''||
                     line[i] == '(') 
                 {
 
-                    THelper.ParseError(i, line);
+                    var str = TokenizeString(line.Slice(i+1), line[i]);
+                    i += str.offset;
 
-                    token.SetToken(TokenKind.badUrlToken);
+                    if (str.token.token == TokenKind.badStringToken) {
 
-                    i += ConsumeBadUrl(line.Slice(i));
+                        THelper.ParseError(i, line);
 
-                    return (token, i);
+                        token.SetToken(TokenKind.badUrlToken);
+
+                        i += ConsumeBadUrl(line.Slice(i));
+
+                        return (token, i);
+                    }
+
+                    token.SetUrl(str.token.representation.ToString());
+
+                    while (Char.IsWhiteSpace(line[i])) i++;
+
+                    if (line[i+1] == ')') {
+                        i++;
+                        return (token, i);
+                    } else {
+
+                        THelper.ParseError(i, line);
+
+                        token.SetToken(TokenKind.badUrlToken);
+
+                        i += ConsumeBadUrl(line.Slice(i));
+
+                        return (token, i);
+                    }
                 }
 
                 if (THelper.IsNonPrintable(line[i])) {

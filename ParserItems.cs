@@ -61,6 +61,7 @@ namespace CSSParser
         }
     }
 
+    [System.Diagnostics.DebuggerDisplay("{token}")]
     public class PreservedTokensNode : ComponentValueNode
     {
         public Token token;
